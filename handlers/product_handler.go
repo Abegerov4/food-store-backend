@@ -20,8 +20,9 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 	category := r.URL.Query().Get("category")
 	search := r.URL.Query().Get("search")
+	sort := r.URL.Query().Get("sort")
 
-	products, err := h.repo.GetProducts(category, search)
+	products, err := h.repo.GetProducts(category, search, sort)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

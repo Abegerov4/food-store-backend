@@ -13,35 +13,32 @@ import (
 
 func main() {
 
-	// 🔌 Mongo
+	//  Mongo
 	config.ConnectMongo()
 
-	// 📦 Repositories
+	//  Repositories
 	productRepo := repositories.NewProductMongoRepository(config.DB)
 	userRepo := repositories.NewUserRepository()
-	orderRepo := repositories.NewOrderMongoRepository(config.DB) // ✅ NEW
+	orderRepo := repositories.NewOrderMongoRepository(config.DB) 
 
-	// 🧠 Services
+	//  Services
 	authService := services.NewAuthService(userRepo)
 
-	// 🎯 Handlers
+	//  Handlers
 	productHandler := handlers.NewProductHandler(productRepo)
 	authHandler := handlers.NewAuthHandler(authService)
 	adminHandler := handlers.NewAdminHandler(productRepo)
-	orderHandler := handlers.NewOrderHandler(orderRepo) // ✅ NEW
+	orderHandler := handlers.NewOrderHandler(orderRepo) 
 
-	// ===============================
-	// 🔓 PUBLIC ROUTES
-	// ===============================
+	//  PUBLIC ROUTES
 
 	http.HandleFunc("/api/products", productHandler.GetProducts)
 
 	http.HandleFunc("/register", authHandler.Register)
 	http.HandleFunc("/login", authHandler.Login)
 
-	// ===============================
-	// 📦 ORDERS (checkout + my orders)
-	// ===============================
+	//  ORDERS (checkout + my orders)
+
 
 	ordersRouter := middleware.AuthMiddleware(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -58,9 +55,7 @@ func main() {
 	
 	http.Handle("/api/orders", ordersRouter)
 
-	// ===============================
-	// 🔐 ADMIN ROUTES
-	// ===============================
+	//  ADMIN ROUTES
 
 	adminRouter := middleware.AuthMiddleware(
 		middleware.AdminMiddleware(
@@ -78,13 +73,13 @@ func main() {
 			}),
 		),
 	)
-	// 🔐 ADMIN UPDATE ORDER STATUS
+	// ADMIN UPDATE ORDER STATUS
 	adminOrdersRouter := middleware.AuthMiddleware(
 		middleware.AdminMiddleware(
 			http.HandlerFunc(orderHandler.UpdateOrderStatus),
 		),
 	)
-	// 🔐 ADMIN GET ALL ORDERS
+	// ADMIN GET ALL ORDERS
 	adminGetOrders := middleware.AuthMiddleware(
 		middleware.AdminMiddleware(
 			http.HandlerFunc(orderHandler.GetAllOrders),
@@ -98,13 +93,11 @@ http.Handle("/api/admin/orders", adminOrdersRouter)
 	http.Handle("/api/admin/products", adminRouter)
 	http.Handle("/api/admin/products/", adminRouter)
 
-	// ===============================
-	// 📁 STATIC FILES
-	// ===============================
+	// STATIC FILES
 
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
-	log.Println("🚀 Server running on http://localhost:8080")
+	log.Println(" Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

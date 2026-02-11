@@ -1,11 +1,27 @@
 const category = "bakery";
 
-document.addEventListener("DOMContentLoaded", loadProducts);
+document.addEventListener("DOMContentLoaded", () => {
+    loadProducts();
 
-function loadProducts() {
-    fetch(`/api/products?category=${category}`)
+    const sortSelect = document.getElementById("sortSelect");
+    sortSelect.addEventListener("change", () => {
+        loadProducts(sortSelect.value);
+    });
+});
+
+function loadProducts(sort = "") {
+
+    let url = `/api/products?category=${category}`;
+
+    if (sort) {
+        url += `&sort=${sort}`;
+    }
+
+    console.log("Fetching:", url);
+
+    fetch(url)
         .then(res => res.json())
-        .then(data => renderProducts(data))
+        .then(renderProducts)
         .catch(err => console.error(err));
 }
 

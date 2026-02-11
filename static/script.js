@@ -138,32 +138,6 @@ function parseJwt(token) {
         return null;
     }
 }
-function renderAuth() {
-    const authArea = document.getElementById("authArea");
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-        // ❌ НЕ залогинен
-        authArea.innerHTML += `
-            <a href="/login.html" class="link-btn">Login</a>
-            <a href="/register.html" class="link-btn">Register</a>
-        `;
-        return;
-    }
-
-    const user = parseJwt(token);
-    if (!user) {
-        localStorage.removeItem("token");
-        location.reload();
-        return;
-    }
-
-    // ✅ ЗАЛОГИНЕН
-    authArea.innerHTML += `
-        <span class="user-email">${user.email}</span>
-        <button class="link-btn" onclick="logout()">Logout</button>
-    `;
-}
 function logout() {
     localStorage.removeItem("token");
     window.location.href = "/index.html";
@@ -176,33 +150,7 @@ function searchFoods() {
     // TODO: реализовать поиск
 }
 
-// 🔥 POPULAR PRODUCTS
-document.addEventListener("DOMContentLoaded", loadPopularProducts);
 
-async function loadPopularProducts() {
-    const res = await fetch("/api/products");
-    const products = await res.json();
-
-    const container = document.getElementById("popularProducts");
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    // берем первые 15
-    products.slice(0, 15).forEach(p => {
-        container.innerHTML += `
-            <div class="product-card">
-                <img src="images/products/${p.image}">
-                <h3>${p.name}</h3>
-                <p class="price">₸ ${p.price}</p>
-                <button class="btn-primary"
-                    onclick='addToCart(${JSON.stringify(p)})'>
-                    Add to cart
-                </button>
-            </div>
-        `;
-    });
-}
 async function searchProducts() {
     const query = document.getElementById("searchInput").value;
 
@@ -301,8 +249,46 @@ function renderAuth() {
     updateCartCount();
 }
 document.addEventListener("DOMContentLoaded", () => {
-    renderAuth();
+    loadPopularProducts();
+
+    const sortSelect = document.getElementById("popularSort");
+    if (sortSelect) {
+        sortSelect.addEventListener("change", () => {
+            loadPopularProducts(sortSelect.value);
+        });
+    }
 });
+
+async function loadPopularProducts(sort = "") {
+
+    let url = "/api/products";
+
+    if (sort) {
+        url += `?sort=${sort}`;
+    }
+
+    const res = await fetch(url);
+    const products = await res.json();
+
+    const container = document.getElementById("popularProducts");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    products.slice(0, 15).forEach(p => {
+        container.innerHTML += `
+            <div class="product-card">
+                <img src="images/products/${p.image}">
+                <h3>${p.name}</h3>
+                <p class="price">₸ ${p.price}</p>
+                <button class="btn-primary"
+                    onclick='addToCart(${JSON.stringify(p)})'>
+                    Add to cart
+                </button>
+            </div>
+        `;
+    });
+}
 function addToCart(product) {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.push(product);

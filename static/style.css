@@ -246,7 +246,18 @@ h2 {
     font-size: 28px;
     margin-bottom: 30px;
 }
+.popular-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
+.popular-header select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
 /* =========================
    CART PAGE
 ========================= */
@@ -731,4 +742,54 @@ footer {
 .btn-remove:hover {
     background: #dc2626;
     transform: scale(1.05);
+}
+/* ===== SORT SELECT ===== */
+
+.sort-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+
+.sort-select {
+    padding: 14px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 14px;
+    border: 2px solid #0f766e;
+    background: white;
+    color: #0f766e;
+    cursor: pointer;
+    min-width: 220px;
+    transition: 0.2s ease;
+}
+
+.sort-select:hover {
+    background: #f0fdfa;
+}
+
+.sort-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(15,118,110,0.15);
+}
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 80px 20px;
+}
+
+.sort-select {
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: 2px solid #0f766e;
+    background: white;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.sort-select:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }

@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ProductMongoRepository struct {
@@ -25,8 +26,8 @@ func (r *ProductMongoRepository) Create(product models.Product) error {
 	return err
 }
 
-// 🔥 НОВЫЙ универсальный GET
-func (r *ProductMongoRepository) GetProducts(category, search string) ([]models.Product, error) {
+// GET
+func (r *ProductMongoRepository) GetProducts(category, search, sort string) ([]models.Product, error) {
 
 	filter := bson.M{}
 
@@ -37,11 +38,23 @@ func (r *ProductMongoRepository) GetProducts(category, search string) ([]models.
 	if search != "" {
 		filter["name"] = bson.M{
 			"$regex":   search,
-			"$options": "i", // ignore case
+			"$options": "i",
 		}
 	}
+	findOptions := options.Find()
 
-	cursor, err := r.collection.Find(context.Background(), filter)
+	// СОРТИРОВКА
+	switch sort {
+	case "price_asc":
+		findOptions.SetSort(bson.D{{Key: "price", Value: 1}})
+	case "price_desc":
+		findOptions.SetSort(bson.D{{Key: "price", Value: -1}})
+	case "name_asc":
+		findOptions.SetSort(bson.D{{Key: "name", Value: 1}})
+	case "name_desc":
+		findOptions.SetSort(bson.D{{Key: "name", Value: -1}})
+	}
+	cursor, err := r.collection.Find(context.Background(), filter, findOptions)
 	if err != nil {
 		return nil, err
 	}

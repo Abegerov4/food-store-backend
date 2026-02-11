@@ -1,17 +1,38 @@
-const category = "pets"; 
+const category = "pets";
 
-document.addEventListener("DOMContentLoaded", loadProducts);
+document.addEventListener("DOMContentLoaded", () => {
+    loadProducts();
 
-function loadProducts() {
-    fetch(`/api/products?category=${category}`)
+    const sortSelect = document.getElementById("sortSelect");
+    sortSelect.addEventListener("change", () => {
+        loadProducts(sortSelect.value);
+    });
+});
+
+function loadProducts(sort = "") {
+
+    let url = `/api/products?category=${category}`;
+
+    if (sort) {
+        url += `&sort=${sort}`;
+    }
+
+    console.log("Fetching:", url);
+
+    fetch(url)
         .then(res => res.json())
         .then(renderProducts)
-        .catch(err => console.error(err));
+        .catch(console.error);
 }
 
 function renderProducts(products) {
     const container = document.getElementById("products");
     container.innerHTML = "";
+
+    if (products.length === 0) {
+        container.innerHTML = "<p>No pet products yet</p>";
+        return;
+    }
 
     products.forEach(p => {
         container.innerHTML += `

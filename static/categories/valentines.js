@@ -1,13 +1,30 @@
-// категория фиксированная (или можешь сделать динамической позже)
 const category = "valentines";
 
-document.addEventListener("DOMContentLoaded", loadProducts);
+document.addEventListener("DOMContentLoaded", () => {
+    loadProducts();
 
-function loadProducts() {
-    fetch(`/api/products?category=${category}`)
+    const sortSelect = document.getElementById("sortSelect");
+    if (sortSelect) {
+        sortSelect.addEventListener("change", () => {
+            loadProducts(sortSelect.value);
+        });
+    }
+});
+
+function loadProducts(sort = "") {
+
+    let url = `/api/products?category=${category}`;
+
+    if (sort) {
+        url += `&sort=${sort}`;
+    }
+
+    console.log("Fetching:", url); // для проверки
+
+    fetch(url)
         .then(res => res.json())
-        .then(data => renderProducts(data))
-        .catch(err => console.error(err));
+        .then(renderProducts)
+        .catch(console.error);
 }
 
 function renderProducts(products) {
@@ -33,13 +50,5 @@ function addToCart(product) {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.push(product);
     localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartCount();
     alert("Added to cart");
-}
-function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const countEl = document.getElementById("cartCount");
-    if (countEl) {
-        countEl.innerText = cart.length;
-    }
 }

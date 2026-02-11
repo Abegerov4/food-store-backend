@@ -1,9 +1,28 @@
 const category = "alcohol";
 
-document.addEventListener("DOMContentLoaded", loadProducts);
+document.addEventListener("DOMContentLoaded", () => {
+    const sortSelect = document.getElementById("sortSelect");
 
-function loadProducts() {
-    fetch(`/api/products?category=${category}`)
+    if (sortSelect) {
+        sortSelect.addEventListener("change", () => {
+            loadProducts(sortSelect.value);
+        });
+    }
+
+    loadProducts();
+});
+
+function loadProducts(sort = "") {
+
+    let url = `/api/products?category=${category}`;
+
+    if (sort) {
+        url += `&sort=${sort}`;
+    }
+
+    console.log("Fetching:", url);
+
+    fetch(url)
         .then(res => res.json())
         .then(renderProducts);
 }
@@ -25,11 +44,4 @@ function renderProducts(products) {
             </div>
         `;
     });
-}
-
-function addToCart(product) {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push(product);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Added to cart");
 }

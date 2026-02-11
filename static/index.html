@@ -15,7 +15,7 @@
                 🛒
                 <span id="cartCount" class="cart-count">0</span>
             </a>
-            <!-- сюда JS подставит login/register ИЛИ email/logout -->
+            <!-- login/register email/logout -->
         </div>
     </header>
     <div class="search-wrapper">
@@ -94,7 +94,19 @@
     </section>
 
     <section class="popular">
-        <h2>🔥 Popular Products</h2>
+
+        <div class="popular-header">
+            <h2>Popular Products</h2>
+    
+            <select id="popularSort" class="sort-select">
+                <option value="">Default</option>
+                <option value="price_asc">Price: Low → High</option>
+                <option value="price_desc">Price: High → Low</option>
+                <option value="name_asc">Name: A → Z</option>
+                <option value="name_desc">Name: Z → A</option>
+            </select>
+        </div>
+    
         <div id="popularProducts" class="products-grid"></div>
     </section>
 
