@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="simple-header">
+    <div class="header-left">
+        <span class="brand">Food Store</span>
+        <span class="page-title">Admin Panel</span>
+    </div>
+
+    <div class="header-actions">
+        <a href="/admin-orders.html" class="link-btn">Orders</a>
+        <a href="/" class="link-btn">Shop</a>
+    </div>
+</header>
+
+<div class="container admin-layout">
+
+    <!-- LEFT SIDE -->
+    <div class="admin-form-card">
+        <h2>Add Product</h2>
+
+        <input id="productName" placeholder="Product name">
+        <input id="productPrice" type="number" placeholder="Price">
+        <input id="productCategory" placeholder="Category">
+        <input id="productImage" placeholder="Image (m1.png)">
+
+        <button class="btn-primary full" onclick="addProduct()">
+            Add product
+        </button
+
+        <p id="error" class="error"></p>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div>
+        <h2>All Products</h2>
+        <div id="products" class="admin-products-grid"></div>
+    </div>
+
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

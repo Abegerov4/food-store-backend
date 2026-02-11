@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Food Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">Food Store</div>
+    
+        <div class="header-right" id="authArea">
+            <a href="/cart.html" class="cart-icon">
+                🛒
+                <span id="cartCount" class="cart-count">0</span>
+            </a>
+            <!-- сюда JS подставит login/register ИЛИ email/logout -->
+        </div>
+    </header>
+    <div class="search-wrapper">
+        <div class="search-box">
+            <input
+            id="searchInput"
+            placeholder="Search for..."
+            oninput="liveSearch()"
+        >
+        </div>
+    </div>
+    <section id="searchResultsSection" style="display:none;">
+        <h2>Search Results</h2>
+        <div id="searchResults" class="products-grid"></div>
+    </section>
+    <section class="categories">
+        <h2>Shop our categories</h2>
+    
+        <div class="categories-grid">
+            
+            <a href="/categories/alcohol.html" class="category-link">
+                <div class="category-card">
+                    <img src="images/categories/alcohol.png">
+                    <span>Alcohol</span>
+                </div>
+            </a>
+    
+            <a href="/categories/valentines.html" class="category-link">
+                <div class="category-card">
+                    <img src="images/categories/valentines.png">
+                    <span>Valentine’s Day</span>
+                </div>
+            </a>
+            <a href="/categories/fruit.html" class="category-link">
+            <div class="category-card">
+                <img src="images/categories/fruit.png">
+                <span>Fruit & Veg</span>
+            </div>
+            </a>
+            <a href="/categories/meat.html" class="category-link">
+                <div class="category-card">
+                    <img src="images/categories/meat.png">
+                    <span>Meat & Fish</span>
+                </div>
+            </a>
+    
+            <a href="/categories/bakery.html" class="category-link">
+                <div class="category-card">
+                    <img src="images/categories/bakery.png">
+                    <span>Bakery</span>
+                </div>
+            </a>
+    
+            <a href="/categories/frozen.html" class="category-link">
+                <div class="category-card">
+                    <img src="images/categories/frozen.png">
+                    <span>Frozen</span>
+                </div>
+            </a>
+    
+            <a href="/categories/drinks.html" class="category-link">
+                <div class="category-card">
+                    <img src="images/categories/drinks.png">
+                    <span>Drinks</span>
+                </div>
+            </a>
+    
+            <a href="/categories/pets.html" class="category-link">
+                <div class="category-card">
+                    <img src="images/categories/pets.png">
+                    <span>Food Pet</span>
+                </div>
+            </a>
+    
+        </div>
+    </section>
+
+    <section class="popular">
+        <h2>🔥 Popular Products</h2>
+        <div id="popularProducts" class="products-grid"></div>
+    </section>
+
+<footer>
+    Advanced Programming • Assignment 4
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

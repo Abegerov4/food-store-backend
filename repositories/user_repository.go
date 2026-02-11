@@ -1,32 +1,54 @@
 package repositories
 
 import (
-	"sync"
+	"context"
+	"errors"
 
+	"food-store-backend/config"
 	"food-store-backend/models"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-type UserRepository struct {
-	mu    sync.Mutex
-	users map[string]models.User
-}
+type UserRepository struct{}
 
 func NewUserRepository() *UserRepository {
-	return &UserRepository{users: make(map[string]models.User)}
+	return &UserRepository{}
 }
 
-func (r *UserRepository) Create(user models.User) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.users[user.ID] = user
-}
+// CREATE USER
+func (r *UserRepository) Create(user models.User) error {
+	collection := config.DB.Collection("users")
 
-func (r *UserRepository) GetAll() []models.User {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	result := []models.User{}
-	for _, u := range r.users {
-		result = append(result, u)
+	// check if exists
+	count, _ := collection.CountDocuments(
+		context.Background(),
+		bson.M{"email": user.Email},
+	)
+
+	if count > 0 {
+		return errors.New("user already exists")
 	}
-	return result
+
+	_, err := collection.InsertOne(context.Background(), user)
+	return err
+}
+
+// FIND BY EMAIL + PASSWORD
+func (r *UserRepository) FindByCredentials(email, password string) (models.User, error) {
+	collection := config.DB.Collection("users")
+
+	var user models.User
+	err := collection.FindOne(
+		context.Background(),
+		bson.M{
+			"email":    email,
+			"password": password,
+		},
+	).Decode(&user)
+
+	if err != nil {
+		return user, errors.New("invalid credentials")
+	}
+
+	return user, nil
 }

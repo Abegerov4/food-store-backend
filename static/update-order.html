@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Order</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    Update Order
+</header>
+
+<div class="center-page">
+    <div class="form-card">
+        <h2>Edit Order</h2>
+        <p>Update the list of food IDs for this order</p>
+
+        <input id="orderFoods" placeholder="Food IDs (f1,f2)">
+
+        <div class="form-actions">
+            <button class="btn-purple" onclick="updateOrder()">
+                Save
+            </button>
+            <button class="btn-blue" onclick="goBack()">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="update-order.js"></script>
+</body>
+</html>

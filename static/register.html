@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authentication</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="simple-header">
+        <div class="header-left">
+            <span class="brand">Food Store</span>
+        </div>
+    
+        <div class="header-actions">
+            <a href="/" class="link-btn">Back to shop</a>
+            <a href="#" class="link-btn">Need help?</a>
+        </div>
+    </header>
+    <div class="center-page">
+        <div class="auth-card-clean">
+    
+            <h2>Create account</h2>
+    
+            <label>Email</label>
+            <input id="email">
+    
+            <label>Password</label>
+            <input id="password" type="password">
+    
+            <button class="btn-primary full" onclick="register()">
+                Create account
+            </button>
+    
+            <div class="divider"></div>
+    
+            <p class="new-customer">
+                Already have an account?
+            </p>
+    
+            <a href="/login.html" class="btn-secondary full">
+                Sign in
+            </a>
+    
+            <p id="error" class="error"></p>
+        </div>
+    </div>
+    
+
+<script src="register.js"></script>
+</body>
+</html>
