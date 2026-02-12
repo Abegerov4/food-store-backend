@@ -125,3 +125,60 @@ func (r *ProductMongoRepository) DeleteByID(id string) error {
 
 	return err
 }
+func (r *ProductMongoRepository) UpdatePriceByName(name string, newPrice int) error {
+
+	_, err := r.collection.UpdateOne(
+		context.Background(),
+		bson.M{"name": name},
+		bson.M{
+			"$set": bson.M{
+				"price": newPrice,
+			},
+		},
+	)
+
+	return err
+}
+func (r *ProductMongoRepository) UpdatePriceWithOriginal(
+	name string,
+	original int,
+	newPrice int,
+) error {
+
+	update := bson.M{
+		"$set": bson.M{
+			"price":         newPrice,
+			"originalPrice": original,
+		},
+	}
+
+	_, err := r.collection.UpdateOne(
+		context.Background(),
+		bson.M{"name": name},
+		update,
+	)
+
+	return err
+}
+func (r *ProductMongoRepository) UpdatePriceOnly(
+	name string,
+	newPrice int,
+) error {
+
+	update := bson.M{
+		"$set": bson.M{
+			"price": newPrice,
+		},
+		"$unset": bson.M{
+			"originalPrice": "",
+		},
+	}
+
+	_, err := r.collection.UpdateOne(
+		context.Background(),
+		bson.M{"name": name},
+		update,
+	)
+
+	return err
+}

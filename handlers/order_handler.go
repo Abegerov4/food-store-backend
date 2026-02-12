@@ -8,6 +8,7 @@ import (
 	"food-store-backend/repositories"
 	"food-store-backend/middleware"
 	"food-store-backend/utils"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type OrderHandler struct {
@@ -140,4 +141,84 @@ func (h *OrderHandler) GetRevenueAnalytics(w http.ResponseWriter, r *http.Reques
 	}
 
 	json.NewEncoder(w).Encode(data)
+}
+func (h *OrderHandler) RecalculatePrices(
+	productRepo *repositories.ProductMongoRepository,
+) (bson.M, error) {
+
+	sales7, err := h.repo.GetSalesLastDays(7)
+	if err != nil {
+		return nil, err
+	}
+
+	sales14, err := h.repo.GetSalesLastDays(14)
+	if err != nil {
+		return nil, err
+	}
+
+	allOrders, _ := h.repo.GetAll()
+
+	updated := 0
+	increased := 0
+	decreased := 0
+
+	productsMap := make(map[string]int)
+
+	for _, order := range allOrders {
+		for _, item := range order.Items {
+			productsMap[item.Name] = item.Price
+		}
+	}
+
+	for name, price := range productsMap {
+
+		newPrice := price
+	
+		// 📈 Popular product (at least 3 sales in last 7 days)
+		if sales7[name] >= 1 {
+			newPrice = int(float64(price) * 1.05)
+			increased++
+		}
+	
+		// Dead product (low demand)
+		if sales14[name] <= 1 {
+    	newPrice = int(float64(price) * 0.90)
+    	decreased++
+		}
+	
+		// 💘 February seasonal boost
+		if time.Now().Month() == time.February {
+			newPrice = int(float64(newPrice) * 1.08)
+		}
+	
+		if newPrice != price {
+			if newPrice < price {
+				productRepo.UpdatePriceWithOriginal(name, price, newPrice)
+			} else {
+				productRepo.UpdatePriceOnly(name, newPrice)
+			}
+			updated++
+		}
+	}
+
+	return bson.M{
+		"updated":   updated,
+		"increased": increased,
+		"decreased": decreased,
+	}, nil
+}
+func (h *OrderHandler) RunDynamicPricing(
+	productRepo *repositories.ProductMongoRepository,
+) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		result, err := h.RecalculatePrices(productRepo)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		json.NewEncoder(w).Encode(result)
+	}
 }

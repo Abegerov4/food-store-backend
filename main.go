@@ -98,6 +98,13 @@ func main() {
 			http.HandlerFunc(orderHandler.GetAllOrders),
 		),
 	)
+	pricingRouter := middleware.AuthMiddleware(
+		middleware.AdminMiddleware(
+			orderHandler.RunDynamicPricing(productRepo),
+		),
+	)
+	
+	http.Handle("/api/admin/pricing/recalculate", pricingRouter)
 
 http.Handle("/api/admin/orders/all", adminGetOrders)
 

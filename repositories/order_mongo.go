@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-
+	"time"
 	"food-store-backend/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -170,4 +170,44 @@ func (r *OrderMongoRepository) GetRevenueByDay() ([]bson.M, error) {
 	}
 
 	return results, nil
+}
+func (r *OrderMongoRepository) GetSalesLastDays(days int) (map[string]int, error) {
+
+	ctx := context.Background()
+
+	pipeline := mongo.Pipeline{
+		{{"$match", bson.D{
+			{"status", "completed"},
+			{"createdAt", bson.D{
+				{"$gte", primitive.NewDateTimeFromTime(
+					time.Now().AddDate(0, 0, -days),
+				)},
+			}},
+		}}},
+		{{"$unwind", "$items"}},
+		{{"$group", bson.D{
+			{"_id", "$items.name"},
+			{"count", bson.D{{"$sum", 1}}},
+		}}},
+	}
+
+	cursor, err := r.collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []bson.M
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, err
+	}
+
+	sales := make(map[string]int)
+
+	for _, r := range results {
+		name := r["_id"].(string)
+		count := int(r["count"].(int32))
+		sales[name] = count
+	}
+
+	return sales, nil
 }

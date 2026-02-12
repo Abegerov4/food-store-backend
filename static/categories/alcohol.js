@@ -77,7 +77,7 @@ function renderProducts(products) {
             <div class="product-card">
                 <img src="../images/products/${p.image}">
                 <h3>${p.name}</h3>
-                <p class="price">₸ ${p.price}</p>
+                ${getPriceHTML(p)}
                 <button class="btn-primary"
                     onclick='addToCart(${JSON.stringify(p)})'>
                     Add to cart

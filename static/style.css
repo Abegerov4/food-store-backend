@@ -886,3 +886,15 @@ footer {
     font-weight: 600;
     color: #2f6f5e;
 }
+.old-price {
+    text-decoration: line-through;
+    color: #9ca3af;
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.new-price {
+    color: #ef4444;
+    font-weight: 700;
+    font-size: 18px;
+}

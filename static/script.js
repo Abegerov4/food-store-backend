@@ -46,6 +46,18 @@ function openUpdateFood(id) {
     window.location.href = `update-food.html?id=${id}`;
 }
 
+function getPriceHTML(p) {
+    if (p.originalPrice && p.originalPrice > p.price) {
+        return `
+            <p class="price">
+                <span class="old-price">₸ ${p.originalPrice}</span>
+                <span class="new-price">₸ ${p.price}</span>
+            </p>
+        `;
+    }
+
+    return `<p class="price">₸ ${p.price}</p>`;
+}
 // DELETE FOOD
 async function deleteFood(id) {
     await fetch(API + "/foods/" + id, {
@@ -178,7 +190,7 @@ function renderSearchResults(products) {
             <div class="product-card">
                 <img src="images/products/${p.image}">
                 <h3>${p.name}</h3>
-                <p class="price">₸ ${p.price}</p>
+                ${getPriceHTML(p)}
                 <button class="btn-primary"
                     onclick='addToCart(${JSON.stringify(p)})'>
                     Add to cart
@@ -283,11 +295,14 @@ async function loadPopularProducts(sort = "") {
     container.innerHTML = "";
 
     products.forEach(p => {
+
+        const priceHTML = getPriceHTML(p);
+    
         container.innerHTML += `
             <div class="product-card">
-                <img src="images/products/${p.image}">
+                <img src="../images/products/${p.image}">
                 <h3>${p.name}</h3>
-                <p class="price">₸ ${p.price}</p>
+                ${priceHTML}
                 <button class="btn-primary"
                     onclick='addToCart(${JSON.stringify(p)})'>
                     Add to cart
