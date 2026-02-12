@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-
+	"strconv"
 	"food-store-backend/repositories"
 )
 
@@ -16,17 +16,41 @@ func NewProductHandler(r *repositories.ProductMongoRepository) *ProductHandler {
 }
 
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 
-	category := r.URL.Query().Get("category")
-	search := r.URL.Query().Get("search")
-	sort := r.URL.Query().Get("sort")
+    category := r.URL.Query().Get("category")
+    search := r.URL.Query().Get("search")
+    sort := r.URL.Query().Get("sort")
 
-	products, err := h.repo.GetProducts(category, search, sort)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+    pageStr := r.URL.Query().Get("page")
+    limitStr := r.URL.Query().Get("limit")
 
-	json.NewEncoder(w).Encode(products)
+    page := 1
+    limit := 12
+
+    if pageStr != "" {
+        p, _ := strconv.Atoi(pageStr)
+        if p > 0 {
+            page = p
+        }
+    }
+
+    if limitStr != "" {
+        l, _ := strconv.Atoi(limitStr)
+        if l > 0 {
+            limit = l
+        }
+    }
+
+    products, total, err := h.repo.GetProducts(category, search, sort, page, limit)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    response := map[string]interface{}{
+        "data":  products,
+        "total": total,
+    }
+
+    json.NewEncoder(w).Encode(response)
 }

@@ -793,3 +793,29 @@ footer {
 .sort-select:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
+.pagination {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.pagination button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid #2f6f60;
+    background: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.pagination button:hover:not(:disabled) {
+    background: #2f6f60;
+    color: white;
+}
+
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}

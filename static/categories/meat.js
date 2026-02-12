@@ -9,9 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-function loadProducts(sort = "") {
+function loadProducts(sort = "", page = 1, limit = 20) {
 
-    let url = `/api/products?category=${category}`;
+    let url = `/api/products?category=${category}&page=${page}&limit=${limit}`;
 
     if (sort) {
         url += `&sort=${sort}`;
@@ -20,13 +20,49 @@ function loadProducts(sort = "") {
     console.log("Fetching:", url);
 
     fetch(url)
-        .then(res => res.json())
-        .then(renderProducts)
-        .catch(console.error);
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Server error: " + res.status);
+            }
+            return res.json();
+        })
+        .then(result => {
+
+            console.log("Response:", result);
+
+            let products = [];
+
+            // Старый формат (массив)
+            if (Array.isArray(result)) {
+                products = result;
+            }
+            // Новый формат (pagination)
+            else if (result && Array.isArray(result.data)) {
+                products = result.data;
+            }
+            else {
+                console.error("Unexpected response format:", result);
+                products = [];
+            }
+
+            renderProducts(products);
+        })
+        .catch(err => {
+            console.error("Fetch error:", err);
+            renderProducts([]);
+        });
 }
 
 function renderProducts(products) {
+
+    if (!Array.isArray(products)) {
+        console.error("renderProducts received non-array:", products);
+        return;
+    }
+
     const container = document.getElementById("products");
+    if (!container) return;
+
     container.innerHTML = "";
 
     if (products.length === 0) {

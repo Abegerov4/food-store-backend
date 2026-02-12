@@ -168,7 +168,7 @@ function renderSearchResults(products) {
     section.style.display = "block";
     container.innerHTML = "";
 
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
         container.innerHTML = "<p>No products found</p>";
         return;
     }
@@ -192,25 +192,25 @@ let searchTimeout = null;
 function liveSearch() {
     const query = document.getElementById("searchInput").value.trim();
 
-    // очищаем предыдущий таймер
     clearTimeout(searchTimeout);
 
-    // если пусто → скрыть результаты
     if (!query) {
         document.getElementById("searchResultsSection").style.display = "none";
         return;
     }
 
-    // задержка 300мс (чтобы не спамить сервер)
     searchTimeout = setTimeout(() => {
-        fetch(`/api/products?search=${query}`)
+        fetch(`/api/products?search=${query}&page=1&limit=20`)
             .then(res => res.json())
-            .then(renderSearchResults);
+            .then(result => {
+                renderSearchResults(result.data);
+            });
     }, 300);
 }
 function renderAuth() {
     const authArea = document.getElementById("authArea");
     const token = localStorage.getItem("token");
+    if (!authArea) return;
 
     let html = `
         <a href="/cart.html" class="cart-icon">
@@ -258,24 +258,31 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+let popularPage = 1;
+const popularLimit = 12;
+let popularTotalPages = 1;
 
 async function loadPopularProducts(sort = "") {
 
-    let url = "/api/products";
+    let url = `/api/products?page=${popularPage}&limit=${popularLimit}`;
 
     if (sort) {
-        url += `?sort=${sort}`;
+        url += `&sort=${sort}`;
     }
 
     const res = await fetch(url);
-    const products = await res.json();
+    const result = await res.json();
+
+    const products = result.data;
+    const total = result.total;
+
+    popularTotalPages = Math.ceil(total / popularLimit);
 
     const container = document.getElementById("popularProducts");
     if (!container) return;
-
     container.innerHTML = "";
 
-    products.slice(0, 15).forEach(p => {
+    products.forEach(p => {
         container.innerHTML += `
             <div class="product-card">
                 <img src="images/products/${p.image}">
@@ -288,11 +295,60 @@ async function loadPopularProducts(sort = "") {
             </div>
         `;
     });
+
+    renderPagination();
+}
+function renderPagination() {
+
+    let pagination = document.getElementById("popularPagination");
+
+    if (!pagination) {
+        pagination = document.createElement("div");
+        pagination.id = "popularPagination";
+        pagination.className = "pagination";
+        document.querySelector(".popular").appendChild(pagination);
+    }
+
+    pagination.innerHTML = `
+        <button 
+            onclick="changePopularPage(-1)"
+            ${popularPage === 1 ? "disabled" : ""}>
+            ← Prev
+        </button>
+
+        <span>
+            Page ${popularPage} of ${popularTotalPages}
+        </span>
+
+        <button 
+            onclick="changePopularPage(1)"
+            ${popularPage === popularTotalPages ? "disabled" : ""}>
+            Next →
+        </button>
+    `;
+}
+
+function changePopularPage(step) {
+
+    if (popularPage + step < 1) return;
+    if (popularPage + step > popularTotalPages) return;
+
+    popularPage += step;
+
+    const sort = document.getElementById("popularSort")?.value || "";
+    loadPopularProducts(sort);
 }
 function addToCart(product) {
+
+    if (!product) return;
+
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
     cart.push(product);
+
     localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartCount();
+
+    updateCartCount?.();
+
     alert("Added to cart");
 }

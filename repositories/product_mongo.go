@@ -27,45 +27,58 @@ func (r *ProductMongoRepository) Create(product models.Product) error {
 }
 
 // GET
-func (r *ProductMongoRepository) GetProducts(category, search, sort string) ([]models.Product, error) {
+func (r *ProductMongoRepository) GetProducts(
+    category, search, sort string,
+    page, limit int,
+) ([]models.Product, int64, error) {
 
-	filter := bson.M{}
+    filter := bson.M{}
 
-	if category != "" {
-		filter["category"] = category
-	}
+    if category != "" {
+        filter["category"] = category
+    }
 
-	if search != "" {
-		filter["name"] = bson.M{
-			"$regex":   search,
-			"$options": "i",
-		}
-	}
-	findOptions := options.Find()
+    if search != "" {
+        filter["name"] = bson.M{
+            "$regex":   search,
+            "$options": "i",
+        }
+    }
 
-	// СОРТИРОВКА
-	switch sort {
-	case "price_asc":
-		findOptions.SetSort(bson.D{{Key: "price", Value: 1}})
-	case "price_desc":
-		findOptions.SetSort(bson.D{{Key: "price", Value: -1}})
-	case "name_asc":
-		findOptions.SetSort(bson.D{{Key: "name", Value: 1}})
-	case "name_desc":
-		findOptions.SetSort(bson.D{{Key: "name", Value: -1}})
-	}
-	cursor, err := r.collection.Find(context.Background(), filter, findOptions)
-	if err != nil {
-		return nil, err
-	}
-	defer cursor.Close(context.Background())
+    total, err := r.collection.CountDocuments(context.Background(), filter)
+    if err != nil {
+        return nil, 0, err
+    }
 
-	var products []models.Product
-	if err := cursor.All(context.Background(), &products); err != nil {
-		return nil, err
-	}
+    findOptions := options.Find()
 
-	return products, nil
+    switch sort {
+    case "price_asc":
+        findOptions.SetSort(bson.D{{Key: "price", Value: 1}})
+    case "price_desc":
+        findOptions.SetSort(bson.D{{Key: "price", Value: -1}})
+    case "name_asc":
+        findOptions.SetSort(bson.D{{Key: "name", Value: 1}})
+    case "name_desc":
+        findOptions.SetSort(bson.D{{Key: "name", Value: -1}})
+    }
+
+    skip := (page - 1) * limit
+    findOptions.SetSkip(int64(skip))
+    findOptions.SetLimit(int64(limit))
+
+    cursor, err := r.collection.Find(context.Background(), filter, findOptions)
+    if err != nil {
+        return nil, 0, err
+    }
+    defer cursor.Close(context.Background())
+
+    var products []models.Product
+    if err := cursor.All(context.Background(), &products); err != nil {
+        return nil, 0, err
+    }
+
+    return products, total, nil
 }
 
 // UPDATE

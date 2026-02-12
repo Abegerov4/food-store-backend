@@ -14,39 +14,47 @@ const user = parseJwt(token);
 if (!user || user.role !== "admin") {
 	window.location.href = "/";
 }
-// 🔹 LOAD PRODUCTS
+//  LOAD PRODUCTS
 async function loadProducts() {
-	const res = await fetch(API + "/api/products");
-	const data = await res.json();
 
-	const container = document.getElementById("products");
-	container.innerHTML = "";
+    const res = await fetch(API + "/api/products?page=1&limit=100");
+    const result = await res.json();
+    const products = Array.isArray(result?.data)
+        ? result.data
+        : Array.isArray(result)
+            ? result
+            : [];
 
-	data.forEach(p => {
-		container.innerHTML += `
-			<div class="admin-product-card">
-				<img src="images/products/${p.image}">
+    const container = document.getElementById("products");
+    if (!container) return;
 
-				<div class="admin-product-info">
-					<input value="${p.name}" id="name-${p.id}">
-					<input value="${p.price}" id="price-${p.id}">
-					<input value="${p.category}" id="category-${p.id}">
-				</div>
+    container.innerHTML = "";
 
-				<div class="admin-actions">
-					<button class="btn-blue btn-small"
-						onclick="updateProduct('${p.id}')">
-						Update
-					</button>
+    products.forEach(p => {
+        container.innerHTML += `
+            <div class="admin-product-card">
+                <img src="images/products/${p.image}">
 
-					<button class="btn-red btn-small"
-						onclick="deleteProduct('${p.id}')">
-						Delete
-					</button>
-				</div>
-			</div>
-		`;
-	});
+                <div class="admin-product-info">
+                    <input value="${p.name}" id="name-${p.id}">
+                    <input value="${p.price}" id="price-${p.id}">
+                    <input value="${p.category}" id="category-${p.id}">
+                </div>
+
+                <div class="admin-actions">
+                    <button class="btn-blue btn-small"
+                        onclick="updateProduct('${p.id}')">
+                        Update
+                    </button>
+
+                    <button class="btn-red btn-small"
+                        onclick="deleteProduct('${p.id}')">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `;
+    });
 }
 
 // ➕ ADD

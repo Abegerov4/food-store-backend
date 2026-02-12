@@ -18,9 +18,7 @@ func NewOrderHandler(r *repositories.OrderMongoRepository) *OrderHandler {
 	return &OrderHandler{repo: r}
 }
 
-//
-// 🔹 CREATE ORDER (checkout)
-//
+//  CREATE ORDER (checkout)
 func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
@@ -33,7 +31,7 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 🔐 получаем email из JWT
+	//  получаем email из JWT
 	claimsValue := r.Context().Value(middleware.UserContextKey)
 	if claimsValue == nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -54,7 +52,7 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(order)
 }
 
-// 🔹 GET ORDERS BY USER EMAIL
+//  GET ORDERS BY USER EMAIL
 func (h *OrderHandler) GetMyOrders(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
@@ -76,7 +74,7 @@ func (h *OrderHandler) GetMyOrders(w http.ResponseWriter, r *http.Request) {
 
     json.NewEncoder(w).Encode(orders)
 }
-// 🔐 ADMIN: UPDATE ORDER STATUS
+//  ADMIN: UPDATE ORDER STATUS
 func (h *OrderHandler) UpdateOrderStatus(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
@@ -105,7 +103,7 @@ func (h *OrderHandler) UpdateOrderStatus(w http.ResponseWriter, r *http.Request)
 
 	w.WriteHeader(http.StatusOK)
 }
-// 🔐 ADMIN: GET ALL ORDERS
+//  ADMIN: GET ALL ORDERS
 func (h *OrderHandler) GetAllOrders(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
