@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-
+	"time"
 	"food-store-backend/models"
 	"food-store-backend/repositories"
 	"food-store-backend/middleware"
@@ -42,7 +42,7 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	order.UserEmail = userClaims.Email
 	order.Status = "processing"
-
+	order.CreatedAt = time.Now()
 	err = h.repo.Create(order)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -115,4 +115,29 @@ func (h *OrderHandler) GetAllOrders(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(orders)
+}
+// ADMIN ANALYTICS
+func (h *OrderHandler) GetAnalytics(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	data, err := h.repo.GetAnalytics()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(data)
+}
+func (h *OrderHandler) GetRevenueAnalytics(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	data, err := h.repo.GetRevenueByDay()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(data)
 }

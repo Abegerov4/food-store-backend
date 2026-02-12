@@ -36,7 +36,20 @@ func main() {
 
 	http.HandleFunc("/register", authHandler.Register)
 	http.HandleFunc("/login", authHandler.Login)
-
+	analyticsRouter := middleware.AuthMiddleware(
+		middleware.AdminMiddleware(
+			http.HandlerFunc(orderHandler.GetAnalytics),
+		),
+	)
+	
+	http.Handle("/api/admin/analytics", analyticsRouter)
+	revenueRouter := middleware.AuthMiddleware(
+		middleware.AdminMiddleware(
+			http.HandlerFunc(orderHandler.GetRevenueAnalytics),
+		),
+	)
+	
+	http.Handle("/api/admin/analytics/revenue", revenueRouter)
 	//  ORDERS (checkout + my orders)
 
 

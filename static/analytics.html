@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Analytics</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="simple-header">
+    <div class="header-left">
+        <span class="brand">Food Store</span>
+        <span class="page-title">Sales Analytics</span>
+    </div>
+
+    <div class="header-actions">
+        <a href="/admin.html" class="link-btn">Products</a>
+        <a href="/admin-orders.html" class="link-btn">Orders</a>
+        <a href="/" class="link-btn">Shop</a>
+    </div>
+</header>
+
+<div class="container analytics-container">
+
+    <div class="analytics-grid">
+
+        <div class="analytics-card">
+            <h3>Total Revenue</h3>
+            <p id="revenue" class="analytics-value">0 ₸</p>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Total Orders</h3>
+            <p id="orders" class="analytics-value">0</p>
+        </div>
+
+    </div>
+
+    <div class="top-products-card">
+        <h2>Top Products</h2>
+        <ul id="topProducts" class="top-products-list"></ul>
+    </div>
+
+</div>
+<h2>Revenue Over Time</h2>
+<canvas id="revenueChart"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="analytics.js"></script>
+
+</body>
+</html>

@@ -80,3 +80,94 @@ func (r *OrderMongoRepository) GetAll() ([]models.Order, error) {
 
 	return orders, nil
 }
+// ADMIN ANALYTICS
+func (r *OrderMongoRepository) GetAnalytics() (bson.M, error) {
+
+	ctx := context.Background()
+
+	// 1️⃣ Total revenue (completed only)
+	revenuePipeline := mongo.Pipeline{
+		{{"$match", bson.D{{"status", "completed"}}}},
+		{{"$group", bson.D{
+			{"_id", nil},
+			{"totalRevenue", bson.D{{"$sum", "$total"}}},
+			{"totalOrders", bson.D{{"$sum", 1}}},
+		}}},
+	}
+
+	cursor, err := r.collection.Aggregate(ctx, revenuePipeline)
+	if err != nil {
+		return nil, err
+	}
+
+	var revenueResult []bson.M
+	if err := cursor.All(ctx, &revenueResult); err != nil {
+		return nil, err
+	}
+
+	totalRevenue := 0
+	totalOrders := 0
+
+	if len(revenueResult) > 0 {
+		totalRevenue = int(revenueResult[0]["totalRevenue"].(int32))
+		totalOrders = int(revenueResult[0]["totalOrders"].(int32))
+	}
+
+	// 2️⃣ Top products
+	topProductsPipeline := mongo.Pipeline{
+		{{"$match", bson.D{{"status", "completed"}}}},
+		{{"$unwind", "$items"}},
+		{{"$group", bson.D{
+			{"_id", "$items.name"},
+			{"quantity", bson.D{{"$sum", 1}}},
+		}}},
+		{{"$sort", bson.D{{"quantity", -1}}}},
+		{{"$limit", 5}},
+	}
+
+	cursor2, err := r.collection.Aggregate(ctx, topProductsPipeline)
+	if err != nil {
+		return nil, err
+	}
+
+	var topProducts []bson.M
+	if err := cursor2.All(ctx, &topProducts); err != nil {
+		return nil, err
+	}
+
+	return bson.M{
+		"totalRevenue": totalRevenue,
+		"totalOrders":  totalOrders,
+		"topProducts":  topProducts,
+	}, nil
+}
+func (r *OrderMongoRepository) GetRevenueByDay() ([]bson.M, error) {
+
+	ctx := context.Background()
+
+	pipeline := mongo.Pipeline{
+		{{"$match", bson.D{{"status", "completed"}}}},
+		{{"$group", bson.D{
+			{"_id", bson.D{
+				{"$dateToString", bson.D{
+					{"format", "%Y-%m-%d"},
+					{"date", "$createdAt"},
+				}},
+			}},
+			{"revenue", bson.D{{"$sum", "$total"}}},
+		}}},
+		{{"$sort", bson.D{{"_id", 1}}}},
+	}
+
+	cursor, err := r.collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []bson.M
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}

@@ -1,6 +1,9 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
 
 type Order struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
@@ -8,4 +11,5 @@ type Order struct {
 	Items     []Product          `bson:"items" json:"items"`
 	Total     int                `bson:"total" json:"total"`
 	Status    string             `bson:"status" json:"status"`
+	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`
 }
